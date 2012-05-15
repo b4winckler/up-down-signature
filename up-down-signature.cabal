@@ -1,0 +1,40 @@
+name:               up-down-signature
+version:            0.1
+synopsis:           Library for up-down signature calculations
+homepage:           https://github.com/b4winckler/up-down-signature
+license:            BSD3
+license-file:       LICENSE
+author:             Björn Winckler <bjorn.winckler@gmail.com>
+maintainer:         Björn Winckler <bjorn.winckler@gmail.com>
+copyright:          2012 Björn Winckler
+category:           Math
+build-type:         Simple
+cabal-version:      >= 1.2
+extra-source-files: README.markdown
+
+description:
+  This library provides functions to calculate probabilities based on up-down
+  signatures.
+
+library
+  exposed-modules:  Data.UpDownSignature
+  other-modules:    Data.UpDownSignature.Utility
+  ghc-options:      -Wall
+  build-depends:    base >= 4 && < 5,
+                    mwc-random >= 0.12,
+                    data-memocombinators >= 0.4.3
+
+-- test-suite tests
+--   type:             exitcode-stdio-1.0
+--   hs-source-dirs:   tests
+--   main-is:          Tests.hs
+--   ghc-options:      -Wall
+--   build-depends:    base
+--                     -- QuickCheck >= 2
+--                     -- test-framework,
+--                     -- test-framework-quickcheck2,
+--                     -- test-framework-hunit,
+
+source-repository head
+  type:       git
+  location:   https://github.com/b4winckler/up-down-signature

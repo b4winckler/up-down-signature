@@ -6,8 +6,8 @@ Up-down signatures are described in:
     EPL **79**, 2007
 
 The algorithms in this library are a generalization of those described above in
-that they can handle the case where each bin of the categorical value can hold
-more than one value.
+that they can handle the case where each bin of the categorical variable can
+hold more than one value.
 
 This library is used by the command line tool
 [sigscore](https://github.com/b4winckler/sigscore).

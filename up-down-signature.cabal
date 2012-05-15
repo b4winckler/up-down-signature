@@ -1,5 +1,5 @@
 name:               up-down-signature
-version:            0.1
+version:            0.1.1
 synopsis:           Library for up-down signature calculations
 homepage:           https://github.com/b4winckler/up-down-signature
 license:            BSD3

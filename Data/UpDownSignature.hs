@@ -134,14 +134,22 @@ cumulative = Memo.arrayRange (1, maxSignature) cumulative'
 bigDiv :: (Real a, Real b, Fractional c) => a -> b -> c
 bigDiv x y = fromRational $ toRational x / toRational y
 
--- | Calculate score for the given paths.
-scorePaths :: (Ord a) => [[a]] -> Double
-scorePaths = fst . foldl' step (0,0)
+-- | Calculate score and its standard error for the given paths.
+-- The standard error is estimated using the formula for the standard error of
+-- the mean.
+scorePaths :: (Ord a) => [[a]] -> (Double, Double)
+scorePaths = estimate . sampleMeanVarLength . map cdf
   where
-    i2d = fromIntegral :: Int -> Double
-    step (!s,!n) !x =
-      let n' = succ n
-      in ((i2d n / i2d n') * s + cdf x / i2d n', n')
+    estimate (m, v, n) = (m, sqrt (v / fromIntegral n))
+
+-- | Robustly compute mean and sample variance in one go (variance estimate is
+-- unbiased by using denominator n-1).
+sampleMeanVarLength :: [Double] -> (Double, Double, Int)
+sampleMeanVarLength = mvl . foldl' step (0, 0, 1)
+  where
+    mvl  (m, q, k)      = let n = k - 1 in (m, q / fromIntegral (n - 1), n)
+    step (!m, !q, !k) x = let m' = m + (x - m) / fromIntegral k
+                          in (m', q + (x - m) * (x - m'), k + 1)
 
 -- | Pick one element of the given list.
 pick :: [a] -> GenIO -> IO a
@@ -175,9 +183,9 @@ cdf = cumulative . signature
 -- | Score for a configuration of points.  This equals the geometric mean of
 -- the cumulative probabilities of all paths through the configuration.
 score :: (Ord a)
-      => [[a]]    -- ^ Configuration
-      -> Double   -- ^ Exact score
-score = scorePaths . paths
+      => [[a]]            -- ^ Configuration
+      -> (Double, Double) -- ^ Exact score and standard error (which is 0)
+score = flip (,) 0 . fst . scorePaths . paths
 
 -- | Approximate the score for a configuration of points by sampling given
 -- number of times from all possible paths through the configuration.
@@ -187,8 +195,8 @@ score = scorePaths . paths
 -- very rapidly with the number of points in the configuration so 'approxScore'
 -- may have to be used for configurations that are not small.
 approxScore :: (Ord a)
-            => GenIO      -- ^ Random number generator
-            -> Int        -- ^ Number of times to sample all paths
-            -> [[a]]      -- ^ Configuration
-            -> IO Double  -- ^ Approximate score
+            => GenIO                -- ^ Random number generator
+            -> Int                  -- ^ Number of times to sample all paths
+            -> [[a]]                -- ^ Configuration
+            -> IO (Double, Double)  -- ^ Approximate score and standard error
 approxScore gen n conf = scorePaths <$> (pickPaths (replicate n conf) gen)

@@ -136,12 +136,12 @@ bigDiv x y = fromRational $ toRational x / toRational y
 
 -- | Calculate score for the given paths.
 scorePaths :: (Ord a) => [[a]] -> Double
-scorePaths = exp . fst . foldl' step (0,0)
+scorePaths = fst . foldl' step (0,0)
   where
     i2d = fromIntegral :: Int -> Double
     step (!s,!n) !x =
       let n' = succ n
-      in ((i2d n / i2d n') * s + (log . cdf) x / i2d n', n')
+      in ((i2d n / i2d n') * s + cdf x / i2d n', n')
 
 -- | Pick one element of the given list.
 pick :: [a] -> GenIO -> IO a

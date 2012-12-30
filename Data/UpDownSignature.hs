@@ -187,8 +187,9 @@ score :: (Ord a)
       -> (Double, Double) -- ^ Exact score and standard error (which is 0)
 score = flip (,) 0 . fst . scorePaths . paths
 
--- | Approximate the score for a configuration of points by sampling given
--- number of times from all possible paths through the configuration.
+-- | Approximate the score for a configuration of points by sampling (with
+-- replacement) the given number of times from all possible paths through the
+-- configuration.
 --
 -- The difference between 'approxScore' and 'score' is that the latter
 -- calculates 'cdf' for all paths through the configuration.  This number grows

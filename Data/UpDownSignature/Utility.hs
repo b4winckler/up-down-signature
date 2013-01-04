@@ -18,7 +18,7 @@ import System.IO (hPutStr, hPutStrLn, stderr)
 
 
 -- | Integer base-2 logarithm
-log2 :: (Bits a, Ord a, Num a1) => a -> a1
+log2 :: (Bits a, Ord a, Num a, Num b) => a -> b
 log2 n | n > 1     = 1 + log2 (n `shiftR` 1)
        | otherwise = 0
 

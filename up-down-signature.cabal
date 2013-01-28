@@ -20,7 +20,6 @@ library
   hs-source-dirs:   src
   exposed-modules:  Data.UpDownSignature
   other-modules:    Data.UpDownSignature.Utility
-  ghc-options:      -Wall
   build-depends:    base >= 4 && < 5,
                     mwc-random >= 0.12,
                     data-memocombinators >= 0.4.3
@@ -28,7 +27,6 @@ library
 executable sigscore
   hs-source-dirs:   src src/sigscore
   main-is:          Main.hs
-  -- ghc-options:      -fforce-recomp -prof -fprof-auto -auto-all -rtsopts
   build-depends:    base >= 4 && < 5,
                     bytestring,
                     bytestring-lexing,

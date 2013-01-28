@@ -17,6 +17,7 @@ description:
   signatures.
 
 library
+  hs-source-dirs:   src
   exposed-modules:  Data.UpDownSignature
   other-modules:    Data.UpDownSignature.Utility
   ghc-options:      -Wall

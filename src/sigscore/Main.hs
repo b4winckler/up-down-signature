@@ -4,10 +4,9 @@ module Main where
 import Control.Applicative ((<$>))
 import Control.Monad (forM_, when)
 import Data.List (nub, sort)
-import Data.Maybe (catMaybes, isNothing, fromJust)
-import System.Console.CmdArgs (cmdArgs, (&=), Data(..), Typeable(..), typ,
+import Data.Maybe (catMaybes)
+import System.Console.CmdArgs (cmdArgs, (&=), typ, Data, Typeable,
                                help, def, args, typFile, summary, program)
-import System.Environment (getArgs)
 import System.Exit (exitSuccess)
 import System.Random.MWC (withSystemRandom)
 
@@ -31,6 +30,7 @@ defaultArgs = Args {
     } &= summary "sigscore v0.3, (C) 2012 Björn Winckler"
       &= program "sigscore"
 
+main :: IO ()
 main = withSystemRandom $ \gen -> do
   as <- cmdArgs $ defaultArgs
 
@@ -56,7 +56,7 @@ main = withSystemRandom $ \gen -> do
   -- Each line is a list of doubles, with as many elements as there were in the
   -- categories line.  Missing values and NAs are allowed.  Go through each and
   -- compute the signature score.
-  forM_ (zip [1..] $ tail ls) $ \(lnum,line) -> do
+  forM_ (zip [(1::Int)..] $ tail ls) $ \(lnum,line) -> do
     let elems  = parseDoubles line
         bins   = map catMaybes $ bin cats elems
     if ncats == length elems && null (filter null bins)
@@ -72,17 +72,22 @@ main = withSystemRandom $ \gen -> do
   logStrLn ""
 
 
+showPair :: (Show a, Show b) => (a, b) -> String
 showPair (x,y) = show x ++ " " ++ show y
 
+countPaths :: [[Double]] -> Int
 countPaths = product . map length
 
+tooManyCategories :: String
 tooManyCategories = "\
 \WARNING: More than 20 categories.  Break up the data into fewer categories\n\
 \         to cut down on processing times."
 
+tooFewCategories :: String
 tooFewCategories = "\
 \ERROR: First line must be a list of at least three integer categories."
 
+foundCategories :: [Int] -> String
 foundCategories xs = "Found " ++ show n ++ " "
   ++ if n == 1 then "category" else "categories" ++ ": " ++ show (sort cs)
   where

@@ -1,5 +1,5 @@
 all:
-	cabal-dev --ghc-options=-Wall
+	cabal-dev install --ghc-options="-Wall -O2"
 
 profiling:
 	cabal-dev install-deps --enable-library-profiling

@@ -1,12 +1,13 @@
 module Data.UpDownSignature.Utility (
-    choose
+    bxor
+  , choose
   , choosem
   , fac
   , fst3
+  , joinFirstTwo
   , log2
   , logStr
   , logStrLn
-  , joinFirstTwo
   , mid
   , pad
   , paths
@@ -81,4 +82,10 @@ paths :: [[a]] -> [[a]]
 paths [] = [[]]
 paths ([]:xss) = paths xss
 paths (xs:xss) = [ x:path | x <- xs, path <- paths xss ]
+
+-- | Boolean xor (there is a bit-wise xor in Data.Bits already)
+bxor :: Bool -> Bool -> Bool
+{-# INLINE bxor #-}
+bxor True  b = not b
+bxor False b = b
 

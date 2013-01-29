@@ -13,8 +13,8 @@ module Data.UpDownSignature (
 
 import Control.Applicative ((<$>))
 import Data.Bits
-import Data.List (foldl', group, unfoldr)
-import Data.UpDownSignature.Utility (log2, fac, fst3, paths)
+import Data.List (foldl')
+import Data.UpDownSignature.Utility (log2, fac, paths, bxor)
 import System.Random.MWC
 import qualified Data.MemoCombinators as Memo
 
@@ -27,12 +27,6 @@ import qualified Data.MemoCombinators as Memo
 -- Permutations on [0..N] have 2^(N-1) signatures, so Int should suffice
 -- since we can only handle N of the order 20 anyway.
 type Signature = Int
-
--- The laps of an ordered list is the maximal number of points that are
--- ordered monotonically.  For example:
---
---   laps [1,2.2,3,0,4] = [2,1,1]
-type Laps = [Int]
 
 -- Representation of a count of permutations.
 --
@@ -49,30 +43,27 @@ maxSignature = bit 20
 -- Convert ordered data to a signature.  A standing assumption is that no two
 -- data points have the same order (this is not checked).
 signature :: Ord a => [a] -> Signature
-signature = lapsToSignature . laps
-
--- Convert laps to signature.
--- It is assumed that the laps only consists of positive integers!
---
--- Invariant:
---
---   lapsToSignature [n] = 2^n - 1
-lapsToSignature :: Laps -> Signature
-lapsToSignature l = fst3 $ foldl' f (0,0,odd $ length l) l
+signature (y0:y1:ys) =
+  let (acc, len, parity, _, _) = foldl' step (0, 1, True, y0<y1, y1) ys
+  in accShift parity acc len
   where
-    f (a,n,p) k = (if p then a + (2^k - 1) `shiftL` n else a, n+k, not p)
+    -- Shift in lap length into accumulator
+    accShift :: Bool -> Int -> Int -> Int
+    {-# INLINE accShift #-}
+    accShift True  a l = a `shiftL` l + 2^l - 1
+    accShift False a l = a `shiftL` l
 
-bxor :: Bool -> Bool -> Bool
-bxor True  b = not b
-bxor False b = b
+    -- Count lap length and update accumulator
+    step (acc, len, parity, inc, x0) x1
+      | inc `bxor` (x0<x1)
+        -- Turning point found, shift into accumulator
+        = (accShift parity acc len, 1, not parity, not inc, x1)
+      | otherwise
+        -- Lap of monotonicity continues, so increment lap length
+        = (acc, len+1, parity, inc, x1)
 
--- Convert ordered data to laps.
-laps :: Ord a => [a] -> Laps
-laps (x0:x1:xs) = reverse $ fst3 $ foldl' step ([1], x0<x1, x1) xs
-  where
-    step (na@(n:ns), inc, x0) x1 | inc `bxor` (x0<x1) = (1:na, not inc, x1)
-                                 | otherwise          = (n+1:ns, inc, x1)
-laps _ = []
+signature _ = 0
+
 
 -- Count the number of permutations with the given signature.
 -- (This is memoized because it would be too slow otherwise.)

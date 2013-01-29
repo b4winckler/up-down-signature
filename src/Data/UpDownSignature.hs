@@ -62,12 +62,17 @@ lapsToSignature l = fst3 $ foldl' f (0,0,odd $ length l) l
   where
     f (a,n,p) k = (if p then a + (2^k - 1) `shiftL` n else a, n+k, not p)
 
+bxor :: Bool -> Bool -> Bool
+bxor True  b = not b
+bxor False b = b
+
 -- Convert ordered data to laps.
 laps :: Ord a => [a] -> Laps
-laps = map length . group . unfoldr isIncreasing
+laps (x0:x1:xs) = reverse $ fst3 $ foldl' step ([1], x0<x1, x1) xs
   where
-    isIncreasing (x:y:zs) = Just (x<y, y:zs)
-    isIncreasing _        = Nothing
+    step (na@(n:ns), inc, x0) x1 | inc `bxor` (x0<x1) = (1:na, not inc, x1)
+                                 | otherwise          = (n+1:ns, inc, x1)
+laps _ = []
 
 -- Count the number of permutations with the given signature.
 -- (This is memoized because it would be too slow otherwise.)

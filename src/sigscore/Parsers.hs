@@ -24,14 +24,19 @@ parseDoubles bs | B.null bs               = []
                           Just (d, ys) -> Just (Just d, skipSep ys)
                           Nothing      -> Just (Nothing, skipSep $ skipNA xs)
 
+isWhitespace :: Char -> Bool
 isWhitespace c = c == ' ' || c == '\t'
 
+isSeparator :: Char -> Bool
 isSeparator c  = c `elem` ",;"
 
+skipWhitespace :: B.ByteString -> B.ByteString
 skipWhitespace = B.dropWhile isWhitespace
 
+skipNA :: B.ByteString -> B.ByteString
 skipNA = B.dropWhile (not . \c -> isWhitespace c || isSeparator c)
 
+skipSep :: B.ByteString -> B.ByteString
 skipSep = skipWhitespace . skip . skipWhitespace
   where
     skip bs = case B.uncons bs of

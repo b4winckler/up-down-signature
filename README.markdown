@@ -24,9 +24,6 @@ for each line and printed on `stdout`.
 
 ## Installation
 
-[Download](https://github.com/b4winckler/sigscore/downloads) a binary version
-and put it somewhere in your path.
-
 Alternatively, clone this repository and build it with `cabal`:
 
     $ git clone https://github.com/b4winckler/sigscore.git
